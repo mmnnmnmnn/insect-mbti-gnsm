@@ -1,138 +1,113 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4efe4">
+  <meta name="description" content="9개의 질문으로 나와 꼭 닮은 곤충 부캐를 찾아보는 국립과천과학관 곤충생태관 체험형 콘텐츠입니다.">
   <title>INSECT MBTI | 나만의 곤충 부캐 찾기</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      font-family:
-        "Pretendard",
-        "Noto Sans KR",
-        Arial,
-        sans-serif;
-      color: #1f3329;
-      background:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.85), transparent 32%),
-        linear-gradient(145deg, #eef6e9, #dcebd7);
-    }
-
-    main {
-      width: min(100%, 560px);
-      padding: 52px 28px;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(56, 91, 67, 0.12);
-      border-radius: 28px;
-      box-shadow: 0 18px 50px rgba(39, 75, 50, 0.14);
-    }
-
-    .label {
-      display: inline-block;
-      margin-bottom: 18px;
-      padding: 8px 14px;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      color: #42614d;
-      background: #edf5e9;
-      border-radius: 999px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(38px, 10vw, 64px);
-      line-height: 1;
-      letter-spacing: -0.04em;
-      color: #243c2c;
-    }
-
-    h2 {
-      margin: 14px 0 24px;
-      font-size: clamp(22px, 6vw, 30px);
-      line-height: 1.35;
-      letter-spacing: -0.04em;
-    }
-
-    p {
-      margin: 0;
-      font-size: 17px;
-      line-height: 1.75;
-      color: #617067;
-    }
-
-    .dots {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 32px;
-    }
-
-    .dots span {
-      width: 9px;
-      height: 9px;
-      background: #8fab91;
-      border-radius: 50%;
-      animation: bounce 1.4s infinite ease-in-out;
-    }
-
-    .dots span:nth-child(2) {
-      animation-delay: 0.15s;
-    }
-
-    .dots span:nth-child(3) {
-      animation-delay: 0.3s;
-    }
-
-    @keyframes bounce {
-      0%, 70%, 100% {
-        transform: translateY(0);
-        opacity: 0.45;
-      }
-
-      35% {
-        transform: translateY(-7px);
-        opacity: 1;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .dots span {
-        animation: none;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <main>
-    <div class="label">국립과천과학관 곤충생태관</div>
+  <main class="app-shell" id="app">
+    <section class="screen screen--start is-active" id="start-screen" aria-labelledby="start-title">
+      <div class="start-card">
+        <div class="brand-mark" aria-hidden="true">INSECT</div>
+        <p class="eyebrow">국립과천과학관 곤충생태관</p>
+        <h1 id="start-title">INSECT MBTI</h1>
+        <p class="subtitle">나만의 곤충 부캐 찾기</p>
 
-    <h1>INSECT MBTI</h1>
-    <h2>나만의 곤충 부캐 찾기</h2>
+        <div class="hero-art" role="img" aria-label="숲속에서 여러 곤충을 관찰하는 모습을 표현한 장식 이미지">
+          <span class="hero-leaf hero-leaf--1">🍃</span>
+          <span class="hero-leaf hero-leaf--2">🌿</span>
+          <span class="hero-insect hero-insect--1">🪲</span>
+          <span class="hero-insect hero-insect--2">🦋</span>
+          <span class="hero-insect hero-insect--3">🐝</span>
+          <span class="hero-spark hero-spark--1">✦</span>
+          <span class="hero-spark hero-spark--2">✦</span>
+        </div>
 
-    <p>
-      곤충의 날 기념 특별 이벤트를 준비하고 있습니다.<br>
-      곧 새로운 모습으로 만나요!
-    </p>
+        <p class="intro-copy">9개의 질문에 답하고<br>나와 꼭 닮은 곤충 부캐를 만나보세요!</p>
 
-    <div class="dots" aria-label="준비 중">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
+        <div class="test-meta" aria-label="테스트 정보">
+          <span>⏱ 약 2~3분</span>
+          <span>✓ 총 9문항</span>
+        </div>
+
+        <button class="button button--primary button--wide" id="start-button" type="button">테스트 시작하기</button>
+
+        <p class="disclaimer">본 콘텐츠는 곤충의 생태적 특징을 활용한 체험형 성향 테스트이며, 실제 MBTI 검사 또는 전문적인 심리검사와는 관련이 없습니다.</p>
+      </div>
+    </section>
+
+    <section class="screen screen--question" id="question-screen" aria-labelledby="question-text" hidden>
+      <div class="question-layout">
+        <header class="question-header">
+          <button class="icon-button" id="home-button" type="button" aria-label="처음 화면으로 돌아가기">⌂</button>
+          <div class="progress-copy"><span id="progress-current">1</span> / <span id="progress-total">9</span></div>
+          <div class="header-spacer" aria-hidden="true"></div>
+        </header>
+
+        <div class="progress-track" aria-hidden="true">
+          <div class="progress-fill" id="progress-fill"></div>
+          <span class="progress-bug" id="progress-bug">🪲</span>
+        </div>
+
+        <article class="question-card">
+          <p class="question-number" id="question-number">QUESTION 1</p>
+          <h2 id="question-text"></h2>
+          <div class="question-visual" id="question-visual" role="img" aria-label="질문 장면을 표현한 장식 이미지"></div>
+          <fieldset class="options" id="options-container">
+            <legend class="sr-only">답변을 하나 선택해주세요</legend>
+          </fieldset>
+        </article>
+
+        <nav class="question-nav" aria-label="문항 이동">
+          <button class="button button--secondary" id="prev-button" type="button">이전</button>
+          <button class="button button--primary" id="next-button" type="button" disabled>다음</button>
+        </nav>
+      </div>
+    </section>
+
+    <section class="screen screen--loading" id="loading-screen" aria-live="polite" hidden>
+      <div class="loading-card">
+        <div class="loading-orbit" aria-hidden="true"><span>🪲</span></div>
+        <h2>나의 곤충 부캐를 찾고 있어요!</h2>
+        <p>곤충의 성향을 분석하는 중...</p>
+      </div>
+    </section>
+
+    <section class="screen screen--result" id="result-screen" aria-labelledby="result-heading" hidden>
+      <div class="result-layout">
+        <p class="eyebrow">INSECT MBTI RESULT</p>
+        <h2 id="result-heading">당신의 곤충 부캐는</h2>
+
+        <figure class="result-card-wrap">
+          <img id="result-image" src="" alt="">
+        </figure>
+
+        <section class="keyword-panel" aria-labelledby="keyword-heading">
+          <h3 id="keyword-heading">나를 나타내는 핵심 키워드</h3>
+          <div class="keyword-list" id="keyword-list"></div>
+        </section>
+
+        <p class="capture-tip">결과 카드를 화면 캡처로 간직해보세요.</p>
+
+        <div class="result-actions">
+          <button class="button button--primary button--wide" id="share-button" type="button">결과 공유하기</button>
+          <button class="button button--secondary button--wide" id="restart-button" type="button">다시 테스트하기</button>
+        </div>
+
+        <p class="toast" id="toast" role="status" aria-live="polite"></p>
+
+        <details class="debug-panel" id="debug-panel" hidden>
+          <summary>디버그 정보</summary>
+          <pre id="debug-output"></pre>
+        </details>
+      </div>
+    </section>
   </main>
+
+  <script src="script.js"></script>
 </body>
 </html>
