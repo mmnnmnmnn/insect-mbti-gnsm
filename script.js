@@ -1,6 +1,23 @@
 "use strict";
 
 // =========================
+// 0. 운영 설정
+// =========================
+const CONFIG = {
+  EVENT_ID: "insect-mbti-2026-09",
+  // Google Apps Script를 웹앱으로 배포한 뒤 /exec URL로 교체하세요.
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzdLxE1yc1qpdsRUq0kimd5d5r-vVupYfrcs3b-_IWQ8g_sThg4IJzf_yeTL-A_TLp5Rw/exec",
+  MAX_RETRY_COUNT: 1,
+  RETRY_DELAY_MS: 1000,
+  REQUEST_TIMEOUT_MS: 10000,
+  COUNT_RETEST_AS_NEW: false
+};
+
+const PARTICIPATION_ID_KEY = `${CONFIG.EVENT_ID}_participationId`;
+const SUBMISSION_STATUS_KEY = `${CONFIG.EVENT_ID}_resultSubmitted`;
+let fallbackParticipationId = null;
+
+// =========================
 // 1. 확정 데이터
 // =========================
 const insects = {
@@ -205,6 +222,8 @@ const elements = {
   optionsContainer: document.getElementById("options-container"),
   resultImage: document.getElementById("result-image"),
   keywordList: document.getElementById("keyword-list"),
+  participantCountPanel: document.getElementById("participant-count-panel"),
+  participantCountText: document.getElementById("participant-count-text"),
   toast: document.getElementById("toast"),
   debugPanel: document.getElementById("debug-panel"),
   debugOutput: document.getElementById("debug-output")
@@ -233,10 +252,12 @@ function resetTest() {
   isCalculating = false;
   lastResult = null;
   elements.toast.textContent = "";
+  setParticipantCountState("hidden");
 }
 
 function startTest() {
   resetTest();
+  getOrCreateParticipationId();
   renderQuestion();
   showScreen("question");
 }
@@ -304,6 +325,7 @@ function showCalculatedResult() {
   window.setTimeout(() => {
     renderResult(lastResult);
     showScreen("result");
+    submitFinalResult(lastResult.resultId);
     isCalculating = false;
   }, 1350);
 }
@@ -331,6 +353,215 @@ function renderResult(result) {
     elements.debugPanel.hidden = true;
   }
 }
+
+
+// =========================
+// 4. 참여 결과 저장 및 참여자 수 표시
+// =========================
+function isStorageConfigured() {
+  return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/.test(CONFIG.APPS_SCRIPT_URL);
+}
+
+function safeStorageGet(key) {
+  try {
+    return window.localStorage.getItem(key);
+  } catch (error) {
+    console.warn("localStorage를 읽지 못했습니다.", error);
+    return null;
+  }
+}
+
+function safeStorageSet(key, value) {
+  try {
+    window.localStorage.setItem(key, value);
+    return true;
+  } catch (error) {
+    console.warn("localStorage에 저장하지 못했습니다.", error);
+    return false;
+  }
+}
+
+function safeStorageRemove(key) {
+  try {
+    window.localStorage.removeItem(key);
+  } catch (error) {
+    console.warn("localStorage 값을 삭제하지 못했습니다.", error);
+  }
+}
+
+function createParticipationId() {
+  if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+  return `participant-${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+}
+
+function getOrCreateParticipationId() {
+  const storedId = safeStorageGet(PARTICIPATION_ID_KEY);
+  if (storedId) return storedId;
+
+  const newId = createParticipationId();
+  fallbackParticipationId = newId;
+  safeStorageSet(PARTICIPATION_ID_KEY, newId);
+  return newId;
+}
+
+function getSubmissionStatus() {
+  const raw = safeStorageGet(SUBMISSION_STATUS_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && parsed.eventId === CONFIG.EVENT_ID ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveSubmissionStatus(payload) {
+  safeStorageSet(SUBMISSION_STATUS_KEY, JSON.stringify({
+    eventId: CONFIG.EVENT_ID,
+    submitted: true,
+    participantNumber: payload.participantNumber,
+    totalParticipants: payload.totalParticipants,
+    savedAt: new Date().toISOString()
+  }));
+}
+
+function setParticipantCountState(state, totalParticipants = null) {
+  if (!elements.participantCountPanel || !elements.participantCountText) return;
+
+  if (state === "hidden") {
+    elements.participantCountPanel.hidden = true;
+    elements.participantCountPanel.classList.remove("is-loading", "is-error");
+    elements.participantCountText.textContent = "";
+    return;
+  }
+
+  elements.participantCountPanel.hidden = false;
+  elements.participantCountPanel.classList.toggle("is-loading", state === "loading");
+  elements.participantCountPanel.classList.toggle("is-error", state === "error");
+
+  if (state === "loading") {
+    elements.participantCountText.textContent = "참여 현황을 불러오는 중이에요.";
+  } else if (state === "success" && Number.isFinite(Number(totalParticipants))) {
+    const formatted = Number(totalParticipants).toLocaleString("ko-KR");
+    elements.participantCountText.textContent = `지금까지 ${formatted}명이 나만의 곤충 부캐를 찾았어요.`;
+  } else if (state === "error") {
+    elements.participantCountText.textContent = "참여자 수를 불러오지 못했습니다.";
+  }
+}
+
+function delay(milliseconds) {
+  return new Promise(resolve => window.setTimeout(resolve, milliseconds));
+}
+
+async function requestJson(url, options = {}) {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal, redirect: "follow" });
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error("INVALID_JSON_RESPONSE");
+    }
+    if (!response.ok || data.success !== true) {
+      throw new Error(data.error || `HTTP_${response.status}`);
+    }
+    return data;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
+async function sendResultRequest(payload) {
+  return requestJson(CONFIG.APPS_SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  });
+}
+
+async function sendWithRetry(payload) {
+  let lastError;
+  for (let attempt = 0; attempt <= CONFIG.MAX_RETRY_COUNT; attempt += 1) {
+    try {
+      return await sendResultRequest(payload);
+    } catch (error) {
+      lastError = error;
+      if (attempt < CONFIG.MAX_RETRY_COUNT) await delay(CONFIG.RETRY_DELAY_MS);
+    }
+  }
+  throw lastError;
+}
+
+async function loadParticipantCount() {
+  if (!isStorageConfigured()) {
+    setParticipantCountState("hidden");
+    return;
+  }
+
+  const url = new URL(CONFIG.APPS_SCRIPT_URL);
+  url.searchParams.set("action", "count");
+  url.searchParams.set("eventId", CONFIG.EVENT_ID);
+
+  try {
+    const data = await requestJson(url.toString(), { method: "GET" });
+    setParticipantCountState("success", data.totalParticipants);
+    const currentStatus = getSubmissionStatus();
+    if (currentStatus) saveSubmissionStatus({ ...currentStatus, totalParticipants: data.totalParticipants });
+  } catch (error) {
+    console.error("참여자 수 조회 실패", error);
+    setParticipantCountState("error");
+  }
+}
+
+async function submitFinalResult(resultId) {
+  if (!isStorageConfigured()) {
+    console.warn("CONFIG.APPS_SCRIPT_URL에 운영용 /exec URL을 입력해야 결과가 저장됩니다.");
+    setParticipantCountState("hidden");
+    return;
+  }
+
+  const existingStatus = getSubmissionStatus();
+  if (existingStatus?.submitted && !CONFIG.COUNT_RETEST_AS_NEW) {
+    if (Number.isFinite(Number(existingStatus.totalParticipants))) {
+      setParticipantCountState("success", existingStatus.totalParticipants);
+    } else {
+      setParticipantCountState("loading");
+    }
+    await loadParticipantCount();
+    return;
+  }
+
+  setParticipantCountState("loading");
+  const payload = {
+    eventId: CONFIG.EVENT_ID,
+    participationId: getOrCreateParticipationId() || fallbackParticipationId,
+    resultId
+  };
+
+  try {
+    const data = await sendWithRetry(payload);
+    saveSubmissionStatus(data);
+    setParticipantCountState("success", data.totalParticipants);
+  } catch (error) {
+    console.error("최종 결과 저장 실패", error);
+    setParticipantCountState("error");
+  }
+}
+
+// 향후 ‘다른 참여자가 테스트하기’ 버튼을 추가할 때 사용할 초기화 함수입니다.
+function resetForNewParticipant() {
+  safeStorageRemove(PARTICIPATION_ID_KEY);
+  safeStorageRemove(SUBMISSION_STATUS_KEY);
+  fallbackParticipationId = null;
+  return getOrCreateParticipationId();
+}
+
+window.createParticipationId = createParticipationId;
+window.getOrCreateParticipationId = getOrCreateParticipationId;
+window.resetForNewParticipant = resetForNewParticipant;
 
 function cleanShareUrl() {
   const url = new URL(window.location.href);
