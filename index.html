@@ -56,7 +56,9 @@
         <article class="question-card">
           <p class="question-number" id="question-number">QUESTION 1</p>
           <h2 id="question-text"></h2>
-          <div class="question-visual" id="question-visual" role="img" aria-label="질문 장면을 표현한 장식 이미지"></div>
+          <div class="question-visual" id="question-visual">
+            <img id="question-image" src="assets/questions/q1.webp" alt="" width="886" height="591" decoding="async">
+          </div>
           <fieldset class="options" id="options-container">
             <legend class="sr-only">답변을 하나 선택해주세요</legend>
           </fieldset>
@@ -90,6 +92,10 @@
           <h3 id="keyword-heading">나를 나타내는 핵심 키워드</h3>
           <div class="keyword-list" id="keyword-list"></div>
         </section>
+        <section class="exhibit-panel" aria-label="곤충생태관 관찰 위치 안내">
+          <p class="exhibit-message">🔍 곤충생태관에서는 <strong id="exhibit-name"></strong><strong id="exhibit-particle"></strong> 실제로 관찰할 수 있어요!</p>
+          <p class="exhibit-location">위치: <strong id="exhibit-zone"></strong></p>
+        </section>
 
         <section class="participant-count-panel" id="participant-count-panel" aria-live="polite" hidden>
           <span class="participant-count-icon" aria-hidden="true">🪲</span>
@@ -109,6 +115,8 @@
           <summary>디버그 정보</summary>
           <pre id="debug-output"></pre>
         </details>
+
+        <p class="aggregation-note">※ 동일한 브라우저에서는 최초 완료 결과 1회만 참여 통계에 반영됩니다.</p>
       </div>
     </section>
   </main>
