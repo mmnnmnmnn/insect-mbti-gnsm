@@ -10,7 +10,7 @@ const CONFIG = {
   MAX_RETRY_COUNT: 1,
   RETRY_DELAY_MS: 1000,
   REQUEST_TIMEOUT_MS: 10000,
-  COUNT_RETEST_AS_NEW: false
+  COUNT_RETEST_AS_NEW: true
 };
 
 const PARTICIPATION_ID_KEY = `${CONFIG.EVENT_ID}_participationId`;
@@ -21,19 +21,19 @@ let fallbackParticipationId = null;
 // 1. 확정 데이터
 // =========================
 const insects = {
-  rhinocerosBeetle: { name: "장수풍뎅이", personality: "든든한 리더", keywords: ["리더십", "책임감", "든든함"], exhibitZone: "육상곤충존", image: "assets/results/1.png", representativeAnswer: { questionId: 1, optionId: 1 } },
-  stagBeetle: { name: "넓적사슴벌레", personality: "용감한 승부사", keywords: ["용기", "승부욕", "자신감"], exhibitZone: "육상곤충존", image: "assets/results/2.png", representativeAnswer: { questionId: 2, optionId: 1 } },
-  jewelBug: { name: "큰광대노린재", personality: "당당한 인기쟁이", keywords: ["개성", "당당함", "친화력"], exhibitZone: "육상곤충존", image: "assets/results/3.png", representativeAnswer: { questionId: 3, optionId: 1 } },
-  grasshopper: { name: "풀무치", personality: "씩씩한 행동대장", keywords: ["행동력", "씩씩함", "추진력"], exhibitZone: "육상곤충존", image: "assets/results/4.png", representativeAnswer: { questionId: 6, optionId: 1 } },
-  whiteSpottedFlowerChafer: { name: "흰점박이꽃무지", personality: "다정한 조력자", keywords: ["배려", "친절", "도움"], exhibitZone: "육상곤충존", image: "assets/results/5.png", representativeAnswer: { questionId: 3, optionId: 3 } },
-  riceGrasshopper: { name: "벼메뚜기", personality: "활기 넘치는 에너자이저", keywords: ["활력", "긍정", "적극성"], exhibitZone: "육상곤충존", image: "assets/results/6.png", representativeAnswer: { questionId: 4, optionId: 1 } },
-  divingBeetle: { name: "물방개", personality: "호기심 많은 탐험가", keywords: ["호기심", "모험심", "탐구력"], exhibitZone: "수서곤충존", image: "assets/results/7.png", representativeAnswer: { questionId: 7, optionId: 1 } },
-  waterBug: { name: "물자라", personality: "믿음직한 보호자", keywords: ["보호", "책임감", "신뢰"], exhibitZone: "수서곤충존", image: "assets/results/8.png", representativeAnswer: { questionId: 5, optionId: 3 } },
-  dragonflyNymph: { name: "왕잠자리수채", personality: "용의주도한 전략가", keywords: ["계획", "집중력", "판단력"], exhibitZone: "수서곤충존", image: "assets/results/9.png", representativeAnswer: { questionId: 1, optionId: 3 } },
-  waterScorpion: { name: "장구애비", personality: "침착한 사색가", keywords: ["침착함", "관찰력", "깊은 생각"], exhibitZone: "수서곤충존", image: "assets/results/10.png", representativeAnswer: { questionId: 5, optionId: 2 } },
-  bumblebee: { name: "서양뒤영벌", personality: "부지런한 협력가", keywords: ["협동", "성실함", "부지런함"], exhibitZone: "꿀벌존", image: "assets/results/11.png", representativeAnswer: { questionId: 6, optionId: 2 } },
-  cabbageButterfly: { name: "배추흰나비", personality: "낭만적인 여행가", keywords: ["자유", "낭만", "새로운 경험"], exhibitZone: "파브르정원", image: "assets/results/12.png", representativeAnswer: { questionId: 7, optionId: 3 } },
-  southernEmperorButterfly: { name: "남방오색나비", personality: "자유로운 예술가", keywords: ["창의력", "감수성", "개성"], exhibitZone: "파브르정원", image: "assets/results/13.png", representativeAnswer: { questionId: 8, optionId: 2 } }
+  rhinocerosBeetle: { name: "장수풍뎅이", personality: "든든한 리더", keywords: ["리더십", "책임감", "든든함"], exhibitZone: "육상곤충존", image: "assets/results/1.webp", representativeAnswer: { questionId: 1, optionId: 1 } },
+  stagBeetle: { name: "넓적사슴벌레", personality: "용감한 승부사", keywords: ["용기", "승부욕", "자신감"], exhibitZone: "육상곤충존", image: "assets/results/2.webp", representativeAnswer: { questionId: 2, optionId: 1 } },
+  jewelBug: { name: "큰광대노린재", personality: "당당한 인기쟁이", keywords: ["개성", "당당함", "친화력"], exhibitZone: "육상곤충존", image: "assets/results/3.webp", representativeAnswer: { questionId: 3, optionId: 1 } },
+  grasshopper: { name: "풀무치", personality: "씩씩한 행동대장", keywords: ["행동력", "씩씩함", "추진력"], exhibitZone: "육상곤충존", image: "assets/results/4.webp", representativeAnswer: { questionId: 6, optionId: 1 } },
+  whiteSpottedFlowerChafer: { name: "흰점박이꽃무지", personality: "다정한 조력자", keywords: ["배려", "친절", "도움"], exhibitZone: "육상곤충존", image: "assets/results/5.webp", representativeAnswer: { questionId: 3, optionId: 3 } },
+  riceGrasshopper: { name: "벼메뚜기", personality: "활기 넘치는 에너자이저", keywords: ["활력", "긍정", "적극성"], exhibitZone: "육상곤충존", image: "assets/results/6.webp", representativeAnswer: { questionId: 4, optionId: 1 } },
+  divingBeetle: { name: "물방개", personality: "호기심 많은 탐험가", keywords: ["호기심", "모험심", "탐구력"], exhibitZone: "수서곤충존", image: "assets/results/7.webp", representativeAnswer: { questionId: 7, optionId: 1 } },
+  waterBug: { name: "물자라", personality: "믿음직한 보호자", keywords: ["보호", "책임감", "신뢰"], exhibitZone: "수서곤충존", image: "assets/results/8.webp", representativeAnswer: { questionId: 5, optionId: 3 } },
+  dragonflyNymph: { name: "왕잠자리수채", personality: "용의주도한 전략가", keywords: ["계획", "집중력", "판단력"], exhibitZone: "수서곤충존", image: "assets/results/9.webp", representativeAnswer: { questionId: 1, optionId: 3 } },
+  waterScorpion: { name: "장구애비", personality: "침착한 사색가", keywords: ["침착함", "관찰력", "깊은 생각"], exhibitZone: "수서곤충존", image: "assets/results/10.webp", representativeAnswer: { questionId: 5, optionId: 2 } },
+  bumblebee: { name: "서양뒤영벌", personality: "부지런한 협력가", keywords: ["협동", "성실함", "부지런함"], exhibitZone: "꿀벌존", image: "assets/results/11.webp", representativeAnswer: { questionId: 6, optionId: 2 } },
+  cabbageButterfly: { name: "배추흰나비", personality: "낭만적인 여행가", keywords: ["자유", "낭만", "새로운 경험"], exhibitZone: "파브르정원", image: "assets/results/12.webp", representativeAnswer: { questionId: 7, optionId: 3 } },
+  southernEmperorButterfly: { name: "남방오색나비", personality: "자유로운 예술가", keywords: ["창의력", "감수성", "개성"], exhibitZone: "파브르정원", image: "assets/results/13.webp", representativeAnswer: { questionId: 8, optionId: 2 } }
 };
 
 const questions = [
@@ -57,7 +57,7 @@ const questions = [
     { id: 2, text: "가보지 않은 장소나 새로운 체험을 찾아 나선다.", scores: { divingBeetle: 2, cabbageButterfly: 1 } },
     { id: 3, text: "그림을 그리거나 만들기를 하며 나만의 작품을 만든다.", scores: { southernEmperorButterfly: 2 } }
   ]},
-  { id: 5, image: "assets/questions/q5.webp", imageAlt: "저녁 공원에서 처음 보는 외계인을 만난 모습", question: "집 근처 공원에서 처음 보는 외계인을 만났다! 어떻게 할까?", options: [
+  { id: 5, image: "assets/questions/q5.webp", imageAlt: "집 근처 공원에서 외계인을 만난 모습", question: "집 근처 공원에서 외계인을 만났다! 어떻게 할까?", options: [
     { id: 1, text: "가까이 다가가 말을 걸어본다.", scores: { divingBeetle: 2, cabbageButterfly: 1 } },
     { id: 2, text: "위험할 수 있으니 거리를 두고 행동을 관찰한다.", scores: { waterScorpion: 2, dragonflyNymph: 1 } },
     { id: 3, text: "곧바로 어른이나 경찰에게 알려 모두가 안전하도록 한다.", scores: { waterBug: 2, rhinocerosBeetle: 1 } }
@@ -77,8 +77,8 @@ const questions = [
     { id: 2, text: "세상에서 가장 아름다운 꽃으로 키운다.", scores: { southernEmperorButterfly: 2, jewelBug: 1 } },
     { id: 3, text: "친구들이 모두 모여 함께 놀 수 있는 커다란 나무 놀이터로 키운다.", scores: { grasshopper: 2, bumblebee: 1 } }
   ]},
-  { id: 9, image: "assets/questions/q9.webp", imageAlt: "인기 스타, 천재 과학자, 슈퍼히어로를 상상하는 모습", question: "다음 중 한 사람이 될 수 있다면?", options: [
-    { id: 1, text: "모두의 사랑을 받는 인기 스타", scores: { jewelBug: 2 } },
+  { id: 9, image: "assets/questions/q9.webp", imageAlt: "방송 크리에이터, 천재 과학자, 슈퍼히어로를 상상하는 모습", question: "다음 중 한 사람이 될 수 있다면?", options: [
+    { id: 1, text: "인기있는 방송 크리에이터", scores: { jewelBug: 2 } },
     { id: 2, text: "세상의 비밀을 밝혀내는 천재 과학자", scores: { waterScorpion: 2, dragonflyNymph: 1 } },
     { id: 3, text: "위험한 순간에 나타나 사람들을 구하는 슈퍼히어로", scores: { waterBug: 2, rhinocerosBeetle: 1 } }
   ]}
@@ -212,6 +212,7 @@ const elements = {
   nextButton: document.getElementById("next-button"),
   restartButton: document.getElementById("restart-button"),
   shareButton: document.getElementById("share-button"),
+  downloadButton: document.getElementById("download-button"),
   progressCurrent: document.getElementById("progress-current"),
   progressTotal: document.getElementById("progress-total"),
   progressFill: document.getElementById("progress-fill"),
@@ -261,7 +262,13 @@ function resetTest() {
 
 function startTest() {
   resetTest();
-  getOrCreateParticipationId();
+  // v4: 완료 1회 = 참여 1건. 이전 완료 기록이 있으면 새 참여 ID를 발급합니다.
+  const existingStatus = getSubmissionStatus();
+  if (existingStatus?.submitted) {
+    resetForNewParticipant();
+  } else {
+    getOrCreateParticipationId();
+  }
   renderQuestion();
   showScreen("question");
 }
@@ -616,7 +623,33 @@ async function shareResult() {
       elements.toast.textContent = "결과 문구와 주소를 복사했습니다.";
     }
   } catch (error) {
-    if (error?.name !== "AbortError") elements.toast.textContent = "공유하지 못했습니다. 화면을 캡처해 저장해주세요.";
+    if (error?.name !== "AbortError") elements.toast.textContent = "공유하지 못했습니다. 결과 이미지 저장하기를 이용해주세요.";
+  }
+}
+
+async function downloadResultImage() {
+  if (!lastResult) return;
+  const insect = insects[lastResult.resultId];
+  const filename = `INSECT-MBTI_${insect.name}.webp`;
+
+  try {
+    const response = await fetch(insect.image, { cache: "no-store" });
+    if (!response.ok) throw new Error(`이미지 요청 실패: ${response.status}`);
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    elements.toast.textContent = "결과 이미지 저장을 시작했습니다.";
+  } catch (error) {
+    console.error("결과 이미지 저장 실패", error);
+    // 일부 모바일 브라우저에서는 download 동작이 제한될 수 있어 원본 이미지를 새 탭으로 엽니다.
+    window.open(insect.image, "_blank", "noopener,noreferrer");
+    elements.toast.textContent = "이미지를 새 화면에서 열었습니다. 길게 눌러 저장해주세요.";
   }
 }
 
@@ -638,6 +671,7 @@ elements.prevButton.addEventListener("click", goPrevious);
 elements.nextButton.addEventListener("click", goNext);
 elements.restartButton.addEventListener("click", startTest);
 elements.shareButton.addEventListener("click", shareResult);
+elements.downloadButton.addEventListener("click", downloadResultImage);
 
 // 새로고침 또는 재접속 시 항상 시작 화면으로 초기화합니다.
 resetTest();
